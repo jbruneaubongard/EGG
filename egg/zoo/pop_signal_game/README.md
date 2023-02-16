@@ -1,17 +1,36 @@
-# README 
+# Population-scale signaling game 
 
-This code implements a population-scale signaling game. 
+This code implements a population-scale signaling game, as well as three different experiments to analyze the influence of centrality on communication protocols in populations of deep neural agents.
 
-Deep neural agents in a population interact by pairs, according to weights defining an interaction graph. 
+## General framework
+### Architecture of the agents
 
-Each pair of agents plays the signaling game described in [1]. The game proceeds as follows:
+Each agent has two 'modules': Sender and Receiver. Each module is a neural network, as described in this table:
+
+|                                               Sender                                              |                                      Receiver                                     |
+|:-------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------:|
+|                  **Linear (in_features=feat_size, out_features=embedding_size)**                  |          **Linear (in_features=feat_size, out_features=embedding_size)**          |
+| Conv2D (in_channels=1, out_channels=hidden_size, kernel_size=(game_size,1), stride=(game_size,1)) | Embedding (num_embeddings=vocab_size, embedding_dim=embedding_size) if Reinforce  |
+|    Conv2D (in_channels=1, out_channels=1, kernel_size=(hidden_size,1), stride=(hidden_size,1))    |   Linear (in_features=vocab_size, out_features=embedding_size) if Gumbel Softmax  |
+|                    Linear (in_features=embedding_size, out_features=vocab_size)                   |                                                                                   |
+
+Sender and Receiver share their first linear layer (in bold), used to embed the images.
+
+### Signaling game
+
+Agents in a population interact by pairs, according to weights defining an interaction graph. 
+
+Each pair of agents plays the signaling game described in [[1]](#references). The game proceeds as follows (image from [[2]](#references)):
+
+![](ref_game.png "Illustration of the signaling game. From [2]")
 
  * Sender is shown a target image alongside with one or many distractor images,
  * Sender sends a one-symbol message to Receiver,
  * Receiver obtains Sender's message and all images in random order,
  * Receiver predicts which of the received images is the target one and agents are rewarded if the prediction is correct.
 
-In this version, agents are entities that have both a Sender and a Receiver module. Those two modules share their embedding layer.
+
+## Implemented setups
 
 Four different setups are implemented (see below for more detailed information):
 - Training
@@ -19,7 +38,21 @@ Four different setups are implemented (see below for more detailed information):
 - Second experiment: two communities with central agents interacting 
 - Third experiment: two communities with central agents interacting + bridge agent from another community
 
-Here's a table summarizing the different setups. In the adjacency matrices, the value on line *i* and column *j* represents the weight of the interaction where agent *i* has the role of the speaker and agent $j$ has the role of the listener.
+Here's a table summarizing the different setups. In the adjacency matrices, the value on line *i* and column *j* represents the weight of the interaction where agent *i* has the role of the sender and agent $j$ has the role of the receiver.
+
+| `type_exp`   | `subtype_exp`       | Corresponding setup                                                          | Corresponding adjacency matrix                             | Comments                             |
+|:------------:|:-------------------:|:----------------------------------------------------------------------------:|:----------------------------------------------------------:|:-------------------------------------------------------------------------------------------------:|
+| training     |                     |<img src="illustrations_exp/training_illustration.png" height="100"/>         |<img src="illustrations_exp/training_adj.png" height="100"/>|                                      |
+| exp_1        |                     |<img src="illustrations_exp/exp_1_illustration.png" height="200" width="400"/>|                                                            |                                      |
+| exp_1        |neighbors            |<img src="illustrations_exp/exp_1_1_illustration.png" height="100"/>          |<img src="illustrations_exp/exp_1_1_adj.png" height="150" width="240" /> | Non-central agents only interact with their two closest neighbors + the central agent|
+| exp_1        |fully_connected      |<img src="illustrations_exp/exp_1_2_illustration.png" height="100"/>          |<img src="illustrations_exp/exp_1_2_adj.png" height="150" width="240"/> | Non-central agents interact with everyone                                       |
+| exp_2        |central-central      |<img src="illustrations_exp/exp_2_1_illustration.png" height="100"/>          |<img src="illustrations_exp/exp_2_1_adj.png" height="250" width="460"/> | The bridge interaction is between the two central nodes                                |
+| exp_2        |central-noncentral   |<img src="illustrations_exp/exp_2_2_illustration.png" height="100"/>          |<img src="illustrations_exp/exp_2_2_adj.png" height="250" width="460"/> | The bridge interaction is between one central node and one non-central node            |
+| exp_2        |noncentral-noncentral|<img src="illustrations_exp/exp_2_3_illustration.png" height="100"/>          |<img src="illustrations_exp/exp_2_3_adj.png" height="250" width="460"/> | The bridge interaction is between two non-central nodes                                |
+| exp_3        |central-central      |<img src="illustrations_exp/exp_3_1_illustration.png" height="100"/>          |<img src="illustrations_exp/exp_3_1_adj.png" height="300" width="400"/> | The bridge agent interacts with the two central nodes                         |
+| exp_3        |central-noncentral   |<img src="illustrations_exp/exp_3_2_illustration.png" height="100"/>          |<img src="illustrations_exp/exp_3_2_adj.png" height="300" width="400"/> | The bridge agent interacts with one central node and one non-central node     |
+| exp_3        |noncentral-noncentral|<img src="illustrations_exp/exp_3_3_illustration.png" height="100"/>          |<img src="illustrations_exp/exp_3_3_adj.png" height="300" width="400"/> | The bridge agent interacts with two non-central nodes                         |
+
 
 - $w_{c,s}$ stands for the weight of the central agent's interactions as a **sender** 
 - $w_{c,r}$ stands for the weight of the central agent's interactions as a **receiver**
@@ -28,33 +61,20 @@ Here's a table summarizing the different setups. In the adjacency matrices, the 
 - $w_{b,s}$ stands for the weight of the bridge agent's interactions as a **sender** 
 - $w_{b,r}$ stands for the weight of the bridge agent's interactions as a **receiver**
 
-| `type_exp`   | `subtype_exp`       | Corresponding setup                                                 | Corresponding adjacency matrix                             | Comments |
-|:------------:|:-------------------:|:-------------------------------------------------------------------:|:----------------------------------------------------------:|:-----:|
-| training     |                     |<img src="illustrations_exp/training_illustration.png" height="100"/>|<img src="illustrations_exp/training_adj.png" height="100"/>| |
-| exp_1        |                     |<img src="illustrations_exp/exp_1_illustration.png" height="200" width="400"/>   |                                                            |  |
-| exp_1        |neighbors            |<img src="illustrations_exp/exp_1_1_illustration.png" height="100"/> |<img src="illustrations_exp/exp_1_1_adj.png" height="150" width="150" /> | Non-central agents only interact with their two closest neighbors + the central agent|
-| exp_1        |fully_connected      |<img src="illustrations_exp/exp_1_2_illustration.png" height="100"/> |<img src="illustrations_exp/exp_1_2_adj.png" height="150" width="150"/> | Non-central agents interact with everyone|
-| exp_2        |central-central      |<img src="illustrations_exp/exp_2_1_illustration.png" height="100"/> |<img src="illustrations_exp/exp_2_1_adj.png" height="200" width="200"/> | The bridge interaction is between the two central nodes|
-| exp_2        |central-noncentral   |<img src="illustrations_exp/exp_2_2_illustration.png" height="100"/> |<img src="illustrations_exp/exp_2_2_adj.png" height="200" width="200"/> | The bridge interaction is between one central node and one non-central node |
-| exp_2        |noncentral-noncentral|<img src="illustrations_exp/exp_2_3_illustration.png" height="100"/> |<img src="illustrations_exp/exp_2_3_adj.png" height="200" width="200"/> | The bridge interaction is between two non-central nodes |
-| exp_3        |central-central      |<img src="illustrations_exp/exp_3_1_illustration.png" height="100"/> |<img src="illustrations_exp/exp_3_1_adj.png" height="200" width="200"/> | The bridge agent interacts with the two central nodes |
-| exp_3        |central-noncentral   |<img src="illustrations_exp/exp_3_2_illustration.png" height="100"/> |<img src="illustrations_exp/exp_3_2_adj.png" height="200" width="200"/> | The bridge agent interacts with one central node and one non-central node|
-| exp_3        |noncentral-noncentral|<img src="illustrations_exp/exp_3_3_illustration.png" height="100"/> |<img src="illustrations_exp/exp_3_3_adj.png" height="200" width="200"/> | The bridge agent interacts with two non-central nodes |
+A list of command line parameters is available [at the end of this document](#command-line-parameters)
 
-A list of command line parameters is available [at the end of this document](#command-line-parameter)
-
-## Training initial communities
+### Training initial communities
 
 To train the initial communities, use the following command (with appropriate arguments):
     
     python train.py --root=root --nb_agents=nb_agents --save_data=True --path_save_exp_data=path
 
 This will create and train `nb_agents` communities of `nb_agents` each and save, for each community, several documents in the 'path' folder:
-- Architecture and weights of all agents (e.g. `agent_3.pt`)
-- A list of used hyperparameters (args.txt)
-- For each epoch, a `json` file containing information about the interactions between agents (e.g. `epoch=7.json`)
+- Architecture and weights of all agents
+- A list of used hyperparameters 
+- For each epoch, a `json` file containing information about the interactions between agents
   
-## First experiment
+### First experiment
 
 <img src="illustrations_exp/exp_1_illustration.png" height="500"/>
 
@@ -66,18 +86,52 @@ This experiment can be run with the following command:
 
     python exp1.py --root=root --nb_agents=nb_agents --subtype_exp=fully_connected --save_data=True --path_save_exp_data=path --w_central_sender=2 --w_central_receiver=2 --w_noncentral=1 --path_agents_data=path_trained_agents_data
 
+See [this section](#implemented-setups) for more information about the different weights that can be configured, and [here](#command-line-parameters) about command line parameters.
+
 Out of `nb_agents` communities of `nb_agents` each, this will create and train `nb_agents` new communities of `nb_agents` each. 
 
-[ADD SKETCH]
+<img src="illustrations_exp/new_com_exp1.png" height="300" />
 
-## Second experiment
+Training communities on the left, mixed communities used in the experiment on the right
 
-UNDER CONSTRUCTION
+Inside each new community, agents play the game in the same way as in the training. For each community, several documents will be saved in the 'path' folder:
+- Architecture and weights of all agents before and after the experiment
+- A list of used hyperparameters and origin of the agents in the new community
+- For each epoch, a `json` file containing information about the interactions between agents
 
-## Third experiment
+### Second experiment
 
-UNDER CONSTRUCTION
+The second experiment consists in making two different trained communities interact via 2 inner agents.
 
+<img src="illustrations_exp/exp_2.png" height="500"/>
+
+This experiment can be run with the following command:
+
+    python exp2.py --nb_agents=nb_agents --subtype_exp=subtype_exp --save_data=True --path_save_exp_data=path --w_central_sender=2 --w_central_receiver=2 --w_noncentral=1 --bridge_w=2 --path_agents_data=path_trained_agents_data
+
+See [this section](#implemented-setups) for more information about the different weights that can be configured, and [here](#command-line-parameters) about command line parameters. 
+
+In every new setup, agents play the game in the same way as in the training. For setup, several documents will be saved in the 'path' folder:
+- Architecture and weights of all agents before and after the experiment
+- A list of used hyperparameters and origin of the agents in the setup
+- For each epoch, a `json` file containing information about the interactions between agents
+
+### Third experiment
+
+The second experiment consists in making two different trained communities interact via a bridge agent coming from another community.
+
+<img src="illustrations_exp/exp_3.png" height="500"/>
+
+This experiment can be run with the following command:
+
+    python exp3.py --nb_agents=nb_agents --subtype_exp=subtype_exp --save_data=True --path_save_exp_data=path --w_central_sender=2 --w_central_receiver=2 --w_noncentral=1 --w_bridge_sender=1 --w_bridge_receiver=1 --path_agents_data=path_trained_agents_data
+
+See [this section](#implemented-setups) for more information about the different weights that can be configured, and [here](#command-line-parameters) about command line parameters.
+
+In every new setup, agents play the game in the same way as in the training. For setup, several documents will be saved in the 'path' folder:
+- Architecture and weights of all agents before and after the experiment
+- A list of used hyperparameters and origin of the agents in the setup
+- For each epoch, a `json` file containing information about the interactions between agents
 
 ## Command line parameters
 Here is a table summarizing other command line parameters:
@@ -98,8 +152,11 @@ Here is a table summarizing other command line parameters:
 | `--path_agents_data`   | path to the directory where agents' networks from training are saved | str  | ''              |
 
 
+## References
 
-[1] *"Multi-agent cooperation and the emergence of (natural) language*, A. Lazaridou, A. Peysakhovich, M. Baroni 
+[1] *Multi-agent cooperation and the emergence of (natural) language*, A. Lazaridou, A. Peysakhovich, M. Baroni 
 [[arxiv]](https://arxiv.org/abs/1612.07182)
 
+[2] *Emergent Multi-Agent Communication in the Deep Learning Era*, A. Lazaridou and M. Baroni
+[[arxiv]](https://doi.org/10.48550/arXiv.2006.02419)
 
