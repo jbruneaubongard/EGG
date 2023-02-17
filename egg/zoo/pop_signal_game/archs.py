@@ -88,7 +88,7 @@ class Graph:
             self.subtype_experiment = opts.subtype_exp
 
             adjacency_matrix = two_communities(
-                opts.nb_agents, 
+                2*opts.nb_agents, 
                 self.weight_central_sender, 
                 self.weight_central_receiver, 
                 self.weight_noncentral, 
@@ -96,16 +96,16 @@ class Graph:
                 )
 
             if self.subtype_experiment == 'central-central':
-                adjacency_matrix[0, opts.nb_agents//2] = self.bridge_weight
-                adjacency_matrix[opts.nb_agents//2, 0] = self.bridge_weight
+                adjacency_matrix[0, opts.nb_agents] = self.bridge_weight
+                adjacency_matrix[opts.nb_agents, 0] = self.bridge_weight
 
             if self.subtype_experiment == 'central-noncentral':
-                adjacency_matrix[0, opts.nb_agents//2 + 1] = self.bridge_weight
-                adjacency_matrix[opts.nb_agents//2 + 1, 0] = self.bridge_weight
+                adjacency_matrix[0, opts.nb_agents + 1] = self.bridge_weight
+                adjacency_matrix[opts.nb_agents + 1, 0] = self.bridge_weight
             
             if self.subtype_experiment == 'noncentral-noncentral':
-                adjacency_matrix[1, opts.nb_agents//2] = self.bridge_weight
-                adjacency_matrix[opts.nb_agents//2, 1] = self.bridge_weight
+                adjacency_matrix[1, opts.nb_agents2] = self.bridge_weight
+                adjacency_matrix[opts.nb_agents2, 1] = self.bridge_weight
 
             self.adjacency_matrix = adjacency_matrix
         
@@ -122,7 +122,7 @@ class Graph:
             self.subtype_experiment = opts.subtype_exp
 
             adjacency_matrix = two_communities(
-                opts.nb_agents, 
+                2*opts.nb_agents + 1, 
                 self.weight_central_sender, 
                 self.weight_central_receiver, 
                 self.weight_noncentral, 
@@ -130,25 +130,25 @@ class Graph:
                 )
             
             if self.subtype_experiment == 'central-central':
-                adjacency_matrix[opts.nb_agents//2, 0] = opts.w_bridge_sender
-                adjacency_matrix[opts.nb_agents//2, opts.nb_agents//2 + 1] = opts.w_bridge_sender
+                adjacency_matrix[opts.nb_agents, 0] = opts.w_bridge_sender
+                adjacency_matrix[opts.nb_agents, opts.nb_agents + 1] = opts.w_bridge_sender
                 
-                adjacency_matrix[0, opts.nb_agents//2] = opts.w_bridge_receiver
-                adjacency_matrix[opts.nb_agents//2 + 1, opts.nb_agents//2] = opts.w_bridge_receiver
+                adjacency_matrix[0, opts.nb_agents] = opts.w_bridge_receiver
+                adjacency_matrix[opts.nb_agents + 1, opts.nb_agents] = opts.w_bridge_receiver
 
             if self.subtype_experiment == 'central-noncentral':
-                adjacency_matrix[opts.nb_agents//2, 0] = opts.w_bridge_sender
-                adjacency_matrix[opts.nb_agents//2, opts.nb_agents//2 + 2] = opts.w_bridge_sender
+                adjacency_matrix[opts.nb_agents, 0] = opts.w_bridge_sender
+                adjacency_matrix[opts.nb_agents, opts.nb_agents + 2] = opts.w_bridge_sender
                 
-                adjacency_matrix[0, opts.nb_agents//2] = opts.w_bridge_receiver
-                adjacency_matrix[opts.nb_agents//2 + 2, opts.nb_agents//2] = opts.w_bridge_receiver
+                adjacency_matrix[0, opts.nb_agents] = opts.w_bridge_receiver
+                adjacency_matrix[opts.nb_agents + 2, opts.nb_agents] = opts.w_bridge_receiver
             
             if self.subtype_experiment == 'noncentral-noncentral':
-                adjacency_matrix[opts.nb_agents//2, 1] = opts.w_bridge_sender
-                adjacency_matrix[opts.nb_agents//2, opts.nb_agents//2 + 2] = opts.w_bridge_sender
+                adjacency_matrix[opts.nb_agents, 1] = opts.w_bridge_sender
+                adjacency_matrix[opts.nb_agents, opts.nb_agents + 2] = opts.w_bridge_sender
                 
-                adjacency_matrix[1, opts.nb_agents//2] = opts.w_bridge_receiver
-                adjacency_matrix[opts.nb_agents//2 + 2, opts.nb_agents//2] = opts.w_bridge_receiver
+                adjacency_matrix[1, opts.nb_agents] = opts.w_bridge_receiver
+                adjacency_matrix[opts.nb_agents + 2, opts.nb_agents] = opts.w_bridge_receiver
 
             self.adjacency_matrix = adjacency_matrix
 

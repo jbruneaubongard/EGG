@@ -8,22 +8,22 @@ import torch.nn as nn
 import egg.core as core
 from egg.zoo.pop_signal_game.features import ImageNetFeat, ImagenetLoader
 from egg.zoo.pop_signal_game.archs import Graph, Agent, get_game
-from egg.zoo.pop_signal_game.utils import save_agents, get_folder_saved_data
+from egg.zoo.pop_signal_game.utils import save_agents, get_folder_saved_data, NumpyEncoder
 from egg.zoo.pop_signal_game.trainers import Trainer
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
-    #change default when publishing
     parser.add_argument(
         "--root", 
-        default="/homedtcl/jbruneaubongard/EGG/data/signaling_game_data/", 
+        default="", 
         help="data root folder",
         )
     parser.add_argument(
         "--nb_agents", 
         type=int, 
         default=1,
-        help="Number of agents in the training population",
+        help="Number of agents in the training population\
+        For exp2 and exp3, number of agents in each training community",
         )
     parser.add_argument(
         "--type_exp", 
@@ -166,8 +166,8 @@ if __name__ == "__main__":
         # Save hyperparameters
         with open(folder_com_data + '/args.txt', 'w') as f:
             dict_opts = {k: v for (k,v) in vars(opts).items() if k in features_to_save}
-            json.dump(dict_opts, f, indent=2)
-
+            dict_opts['adjacency_matrix'] = graph.adjacency_matrix
+            json.dump(dict_opts, f, cls=NumpyEncoder, indent=2)
         trainer.train(n_epochs=opts.n_epochs, path=folder_com_data)
         
         # Save agents' weights

@@ -22,13 +22,14 @@ Agents in a population interact by pairs, according to weights defining an inter
 
 Each pair of agents plays the signaling game described in [[1]](#references). The game proceeds as follows (image from [[2]](#references)):
 
-![](ref_game.png "Illustration of the signaling game. From [2]")
+![](illustrations_exp/ref_game.png "Illustration of the signaling game. From [2]")
 
  * Sender is shown a target image alongside with one or many distractor images,
  * Sender sends a one-symbol message to Receiver,
  * Receiver obtains Sender's message and all images in random order,
  * Receiver predicts which of the received images is the target one and agents are rewarded if the prediction is correct.
 
+The data used in the paper can be downloaded from [this link](https://dl.fbaipublicfiles.com/signaling_game_data).
 
 ## Implemented setups
 
@@ -46,12 +47,12 @@ Here's a table summarizing the different setups. In the adjacency matrices, the 
 | exp_1        |                     |<img src="illustrations_exp/exp_1_illustration.png" height="200" width="400"/>|                                                            |                                      |
 | exp_1        |neighbors            |<img src="illustrations_exp/exp_1_1_illustration.png" height="100"/>          |<img src="illustrations_exp/exp_1_1_adj.png" height="150" width="240" /> | Non-central agents only interact with their two closest neighbors + the central agent|
 | exp_1        |fully_connected      |<img src="illustrations_exp/exp_1_2_illustration.png" height="100"/>          |<img src="illustrations_exp/exp_1_2_adj.png" height="150" width="240"/> | Non-central agents interact with everyone                                       |
-| exp_2        |central-central      |<img src="illustrations_exp/exp_2_1_illustration.png" height="100"/>          |<img src="illustrations_exp/exp_2_1_adj.png" height="250" width="460"/> | The bridge interaction is between the two central nodes                                |
-| exp_2        |central-noncentral   |<img src="illustrations_exp/exp_2_2_illustration.png" height="100"/>          |<img src="illustrations_exp/exp_2_2_adj.png" height="250" width="460"/> | The bridge interaction is between one central node and one non-central node            |
-| exp_2        |noncentral-noncentral|<img src="illustrations_exp/exp_2_3_illustration.png" height="100"/>          |<img src="illustrations_exp/exp_2_3_adj.png" height="250" width="460"/> | The bridge interaction is between two non-central nodes                                |
-| exp_3        |central-central      |<img src="illustrations_exp/exp_3_1_illustration.png" height="100"/>          |<img src="illustrations_exp/exp_3_1_adj.png" height="300" width="400"/> | The bridge agent interacts with the two central nodes                         |
-| exp_3        |central-noncentral   |<img src="illustrations_exp/exp_3_2_illustration.png" height="100"/>          |<img src="illustrations_exp/exp_3_2_adj.png" height="300" width="400"/> | The bridge agent interacts with one central node and one non-central node     |
-| exp_3        |noncentral-noncentral|<img src="illustrations_exp/exp_3_3_illustration.png" height="100"/>          |<img src="illustrations_exp/exp_3_3_adj.png" height="300" width="400"/> | The bridge agent interacts with two non-central nodes                         |
+| exp_2        |central-central      |<img src="illustrations_exp/exp_2_1_illustration.png" height="100"/>          |<img src="illustrations_exp/exp_2_1_adj.png" height="150" width="276"/> | The bridge interaction is between the two central nodes                                |
+| exp_2        |central-noncentral   |<img src="illustrations_exp/exp_2_2_illustration.png" height="100"/>          |<img src="illustrations_exp/exp_2_2_adj.png" height="150" width="276"/> | The bridge interaction is between one central node and one non-central node            |
+| exp_2        |noncentral-noncentral|<img src="illustrations_exp/exp_2_3_illustration.png" height="100"/>          |<img src="illustrations_exp/exp_2_3_adj.png" height="150" width="276"/> | The bridge interaction is between two non-central nodes                                |
+| exp_3        |central-central      |<img src="illustrations_exp/exp_3_1_illustration.png" height="100"/>          |<img src="illustrations_exp/exp_3_1_adj.png" height="150" width="200"/> | The bridge agent interacts with the two central nodes                         |
+| exp_3        |central-noncentral   |<img src="illustrations_exp/exp_3_2_illustration.png" height="100"/>          |<img src="illustrations_exp/exp_3_2_adj.png" height="150" width="200"/> | The bridge agent interacts with one central node and one non-central node     |
+| exp_3        |noncentral-noncentral|<img src="illustrations_exp/exp_3_3_illustration.png" height="100"/>          |<img src="illustrations_exp/exp_3_3_adj.png" height="150" width="200"/> | The bridge agent interacts with two non-central nodes                         |
 
 
 - $w_{c,s}$ stands for the weight of the central agent's interactions as a **sender** 
@@ -61,7 +62,6 @@ Here's a table summarizing the different setups. In the adjacency matrices, the 
 - $w_{b,s}$ stands for the weight of the bridge agent's interactions as a **sender** 
 - $w_{b,r}$ stands for the weight of the bridge agent's interactions as a **receiver**
 
-A list of command line parameters is available [at the end of this document](#command-line-parameters)
 
 ### Training initial communities
 
@@ -73,6 +73,15 @@ This will create and train `nb_agents` communities of `nb_agents` each and save,
 - Architecture and weights of all agents
 - A list of used hyperparameters 
 - For each epoch, a `json` file containing information about the interactions between agents
+
+| Command line parameter |                              Description                             | Type |     Default     |
+|:----------------------:|:--------------------------------------------------------------------:|------|:---------------:|
+|        `--root`        |                           data root folder                           | str  |        ''       |
+|      `--nb_agents`     |                   number of agents in each community                 | int  |        1        |
+|      `--save_data`     |                  whether to save training data or not                | bool |      False      |
+| `--path_save_exp_data` |      path to the directory where agents' networks will be saved      | str  |    '/results'   |
+
+A list of other command line parameters is available [at the end of this document](#other-command-line-parameters)
   
 ### First experiment
 
@@ -86,7 +95,20 @@ This experiment can be run with the following command:
 
     python exp1.py --root=root --nb_agents=nb_agents --subtype_exp=fully_connected --save_data=True --path_save_exp_data=path --w_central_sender=2 --w_central_receiver=2 --w_noncentral=1 --path_agents_data=path_trained_agents_data
 
-See [this section](#implemented-setups) for more information about the different weights that can be configured, and [here](#command-line-parameters) about command line parameters.
+| Command line parameter |                              Description                             | Type |     Default     |        Possible values         |
+|:----------------------:|:--------------------------------------------------------------------:|:----:|:---------------:|:------------------------------:|
+|        `--root`        |                           data root folder                           | str  |       ''        |              Any               |
+|      `--nb_agents`     |              number of agents in each training community             | int  |        1        |              Any               |
+|     `--subtype_exp`    |                         subtype of experiment                        | str  |'fully_connected'| 'fully_connected', 'neighbors' |
+|  `--w_central_sender`  |                  sender weight of the central agent                  | int  |        0        |              Any               |
+| `--w_central_receiver` |                 receiver weight of the central agent                 | int  |        0        |              Any               |
+|    `--w_noncentral`    |          weight of interaction between two noncentral nodes          | int  |        0        |              Any               |
+|      `--save_data`     |                  whether to save training data or not                | bool |      False      |          True, False           |
+| `--path_save_exp_data` |      path to the directory where agents' networks will be saved      | str  |   '/results'    |              Any               |
+| `--path_agents_data`   | path to the directory where agents' networks from training are saved | str  |       ''        |              Any               |
+
+
+See [this section](#implemented-setups) for more information about the different weights that can be configured, and [here](#other-command-line-parameters) about other command line parameters.
 
 Out of `nb_agents` communities of `nb_agents` each, this will create and train `nb_agents` new communities of `nb_agents` each. 
 
@@ -109,7 +131,21 @@ This experiment can be run with the following command:
 
     python exp2.py --nb_agents=nb_agents --subtype_exp=subtype_exp --save_data=True --path_save_exp_data=path --w_central_sender=2 --w_central_receiver=2 --w_noncentral=1 --bridge_w=2 --path_agents_data=path_trained_agents_data
 
-See [this section](#implemented-setups) for more information about the different weights that can be configured, and [here](#command-line-parameters) about command line parameters. 
+| Command line parameter |                              Description                             | Type |     Default     |                         Possible values                          |
+|:----------------------:|:--------------------------------------------------------------------:|:----:|:---------------:|:----------------------------------------------------------------:|
+|        `--root`        |                           data root folder                           | str  |       ''        |                               Any                                |
+|      `--nb_agents`     |              number of agents in each training community             | int  |        1        |                               Any                                |
+|     `--subtype_exp`    |                         subtype of experiment                        | str  |       ''        | 'central-central', 'central-noncentral', 'noncentral-noncentral' |
+|  `--w_central_sender`  |                  sender weight of the central agent                  | int  |        0        |                               Any                                |
+| `--w_central_receiver` |                 receiver weight of the central agent                 | int  |        0        |                               Any                                |
+|    `--w_noncentral`    |          weight of interaction between two noncentral nodes          | int  |        0        |                               Any                                |
+|      `--bridge_w`      |                    weight of the bridge interaction                  | int  |        0        |                               Any                                |
+|      `--save_data`     |                  whether to save training data or not                | bool |      False      |                           True, False                            |
+| `--path_save_exp_data` |      path to the directory where agents' networks will be saved      | str  |   '/results'    |                               Any                                |
+| `--path_agents_data`   | path to the directory where agents' networks from training are saved | str  |       ''        |                               Any                                |
+
+
+See [this section](#implemented-setups) for more information about the different weights that can be configured, and [here](#other-command-line-parameters) about other command line parameters. 
 
 In every new setup, agents play the game in the same way as in the training. For setup, several documents will be saved in the 'path' folder:
 - Architecture and weights of all agents before and after the experiment
@@ -126,30 +162,48 @@ This experiment can be run with the following command:
 
     python exp3.py --nb_agents=nb_agents --subtype_exp=subtype_exp --save_data=True --path_save_exp_data=path --w_central_sender=2 --w_central_receiver=2 --w_noncentral=1 --w_bridge_sender=1 --w_bridge_receiver=1 --path_agents_data=path_trained_agents_data
 
-See [this section](#implemented-setups) for more information about the different weights that can be configured, and [here](#command-line-parameters) about command line parameters.
+| Command line parameter |                              Description                             | Type |     Default     |                         Possible values                          |
+|:----------------------:|:--------------------------------------------------------------------:|:----:|:---------------:|:----------------------------------------------------------------:|
+|        `--root`        |                           data root folder                           | str  |       ''        |                               Any                                |
+|      `--nb_agents`     |              number of agents in each training community             | int  |        1        |                               Any                                |
+|     `--subtype_exp`    |                         subtype of experiment                        | str  |       ''        | 'central-central', 'central-noncentral', 'noncentral-noncentral' |
+|  `--w_central_sender`  |                  sender weight of the central agent                  | int  |        0        |                               Any                                |
+| `--w_central_receiver` |                 receiver weight of the central agent                 | int  |        0        |                               Any                                |
+|    `--w_noncentral`    |          weight of interaction between two noncentral nodes          | int  |        0        |                               Any                                |
+|  `--w_bridge_sender`   |                   sender weight of the bridge agent                  | int  |        0        |                               Any                                |
+| `--w_bridge_receiver`  |                  receiver weight of the bridge agent                 | int  |        0        |                               Any                                |
+|      `--save_data`     |                  whether to save training data or not                | bool |      False      |                           True, False                            |
+| `--path_save_exp_data` |      path to the directory where agents' networks will be saved      | str  |   '/results'    |                               Any                                |
+| `--path_agents_data`   | path to the directory where agents' networks from training are saved | str  |       ''        |                               Any                                |
+
+See [this section](#implemented-setups) for more information about the different weights that can be configured, and [here](#other-command-line-parameters) about other command line parameters.
 
 In every new setup, agents play the game in the same way as in the training. For setup, several documents will be saved in the 'path' folder:
 - Architecture and weights of all agents before and after the experiment
 - A list of used hyperparameters and origin of the agents in the setup
 - For each epoch, a `json` file containing information about the interactions between agents
 
-## Command line parameters
+## Other command line parameters
 Here is a table summarizing other command line parameters:
+ * `--embedding_size` sets the size of the symbol embeddings used by Receiver (default: 50)
+ * `--hidden_size` the hidden layer size used by both agents (default: 20)
+ * `--batches_per_epoch` how many batches per epoch (default: 100)
+ * `--mode` specifies which training mode will be used - either Gumbel Softmax relaxation (`--mode=gs`) or Reinforce 
+ (`--mode=rf`) (default: `rf`)
+ * `--gs_tau` sets the Gumbel Softmax relaxation temperature (default: 1.0
 
-| Command line parameter |                              Description                             | Type |     Default     |
-|:----------------------:|:--------------------------------------------------------------------:|------|:---------------:|
-|        `--root`        |                           data root folder                           | str  |        ''       |
-|      `--nb_agents`     |                        total number of agents                        | int  |        1        |
-|       `--type_exp`     |                          type of experiment                          | str  |    'training'   |
-|     `--subtype_exp`    |                         subtype of experiment                        | str  |        ''       |
-|  `--w_central_sender`  |                  sender weight of the central agent                  | int  |        0        |
-| `--w_central_receiver` |                 receiver weight of the central agent                 | int  |        0        |
-|    `--w_noncentral`    |          weight of interaction between two noncentral nodes          | int  |        0        |
-|      `--bridge_w`      |               weight of the bridge interaction (exp_2)               | int  |        0        |
-|   `--w_bridge_sender`  |               sender weight of the bridge agent (exp_3)              | int  |        0        |
-|  `--w_bridge_receiver` |              receiver weight of the bridge agent (exp_3)             | int  |        0        |
-| `--path_save_agents`   | path to the directory where agents' networks will be saved           | str  | '/saved_agents' |
-| `--path_agents_data`   | path to the directory where agents' networks from training are saved | str  | ''              |
+| Command line parameter |                                     Description                               | Type |     Default     |              Possible values            |  
+|:----------------------:|:-----------------------------------------------------------------------------:|:----:|:---------------:|:---------------------------------------:|
+|       `--tau_gs`       |                    softmax temperature for sender                             |float |       10.0      |                   Any                   |
+|      `--game_size`     |      number of images used (one is the target, the are rest distractors)      | int  |        2        |                   Any                   |
+|        `--same`        |whether distractor images should be sampled from the same concept as the target| int  |        0        |                   0,1                   |
+|     `--vocab_size`     |                  number of symbols for communication                          | int  |       100       |                   Any                   |
+|     `--batch_size`     |                                batch size                                     | int  |       32        |                   Any                   |
+|   `--embedding_size`   |                size of the symbol embeddings used by receiver                 | int  |       50        |                   Any                   |
+|     `--hidden_size`    |                              hidden layer size                                | int  |       20        |                   Any                   |
+| `--batches_per_epoch`  |                        how many batches per epoch                             | int  |       100       |                   Any                   |
+|       `--mode`         |                               training mode                                   | str  |       'rf'      | 'rf' (Reinforce), 'gs' (Gumbel Softmax) |
+|      `--gs_tau`        |                      Gumbel Softmax relaxation temperature                    |float |       1.0       |                   Any                   |
 
 
 ## References

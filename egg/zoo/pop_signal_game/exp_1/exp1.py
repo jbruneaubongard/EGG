@@ -7,22 +7,22 @@ import torch.nn as nn
 import egg.core as core
 from egg.zoo.pop_signal_game.features import ImageNetFeat, ImagenetLoader
 from egg.zoo.pop_signal_game.archs import Graph, get_game
-from egg.zoo.pop_signal_game.utils import save_agents, get_folder_saved_data, get_new_communities_from_saved_agents
+from egg.zoo.pop_signal_game.utils import save_agents, get_folder_saved_data, get_new_communities_from_saved_agents, NumpyEncoder
 from egg.zoo.pop_signal_game.trainers import Trainer
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
-    #change default when publishing
     parser.add_argument(
         "--root", 
-        default="/homedtcl/jbruneaubongard/EGG/data/signaling_game_data/", 
+        default="", 
         help="data root folder",
         )
     parser.add_argument(
         "--nb_agents", 
         type=int, 
         default=1,
-        help="Number of agents in the population",
+        help="Number of agents in the training population\
+        For exp2 and exp3, number of agents in each training community",
         )
     parser.add_argument(
         "--type_exp", 
@@ -32,7 +32,9 @@ def parse_arguments():
     parser.add_argument(
         "--subtype_exp", 
         default='fully_connected', 
-        help="Subtype of experiment. If training: ''. If exp_1: neighbors or fully_connected. Else: central-central, central-noncentral or noncentral-noncentral",
+        help="Subtype of experiment. \
+        If exp_1: neighbors or fully_connected. \
+        If exp_2 or exp_3: central-central, central-noncentral or noncentral-noncentral",
         )
     parser.add_argument(
         "--w_central_sender", 
@@ -200,7 +202,8 @@ if __name__ == "__main__":
         with open(folder_com_data + '/args.txt', 'w') as f:
             dict_opts = {k: v for (k,v) in vars(opts).items() if k in features_to_save}
             dict_opts['origin_agents'] = dict_origin_of_agents[str(idx_new_community)]
-            json.dump(dict_opts, f, indent=2)
+            dict_opts['adjacency_matrix'] = graph.adjacency_matrix
+            json.dump(dict_opts, f, cls=NumpyEncoder, indent=2)
 
         trainer.train(n_epochs=opts.n_epochs, path=folder_com_data)
         
