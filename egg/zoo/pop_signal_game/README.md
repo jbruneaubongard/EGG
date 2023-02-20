@@ -1,6 +1,6 @@
-# Population-scale signaling game 
+# Population-scale signalling game 
 
-This code implements a population-scale signaling game, as well as three different experiments to analyze the influence of centrality on communication protocols in populations of deep neural agents.
+This code implements a population-scale signalling game, as well as three different experiments to analyze the influence of centrality on communication protocols in populations of deep neural agents.
 
 ## General framework
 ### Architecture of the agents
@@ -16,13 +16,13 @@ Each agent has two 'modules': Sender and Receiver. Each module is a neural netwo
 
 Sender and Receiver share their first linear layer (in bold), used to embed the images.
 
-### Signaling game
+### Signalling game
 
 Agents in a population interact by pairs, according to weights defining an interaction graph. 
 
-Each pair of agents plays the signaling game described in [[1]](#references). The game proceeds as follows (image from [[2]](#references)):
+Each pair of agents plays the signalling game described in [[1]](#references). The game proceeds as follows (image from [[2]](#references)):
 
-![](illustrations_exp/ref_game.png "Illustration of the signaling game. From [2]")
+![](illustrations_exp/ref_game.png "Illustration of the signalling game. From [2]")
 
  * Sender is shown a target image alongside with one or many distractor images,
  * Sender sends a one-symbol message to Receiver,
@@ -185,17 +185,11 @@ In every new setup, agents play the game in the same way as in the training. For
 
 ## Other command line parameters
 Here is a table summarizing other command line parameters:
- * `--embedding_size` sets the size of the symbol embeddings used by Receiver (default: 50)
- * `--hidden_size` the hidden layer size used by both agents (default: 20)
- * `--batches_per_epoch` how many batches per epoch (default: 100)
- * `--mode` specifies which training mode will be used - either Gumbel Softmax relaxation (`--mode=gs`) or Reinforce 
- (`--mode=rf`) (default: `rf`)
- * `--gs_tau` sets the Gumbel Softmax relaxation temperature (default: 1.0
 
 | Command line parameter |                                     Description                               | Type |     Default     |              Possible values            |  
 |:----------------------:|:-----------------------------------------------------------------------------:|:----:|:---------------:|:---------------------------------------:|
 |       `--tau_gs`       |                    softmax temperature for sender                             |float |       10.0      |                   Any                   |
-|      `--game_size`     |      number of images used (one is the target, the are rest distractors)      | int  |        2        |                   Any                   |
+|      `--game_size`     |      number of images used (one is the target, the rest are distractors)      | int  |        2        |                   Any                   |
 |        `--same`        |whether distractor images should be sampled from the same concept as the target| int  |        0        |                   0,1                   |
 |     `--vocab_size`     |                  number of symbols for communication                          | int  |       100       |                   Any                   |
 |     `--batch_size`     |                                batch size                                     | int  |       32        |                   Any                   |
